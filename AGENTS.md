@@ -11,9 +11,8 @@
 | Markup   | HTML5                       |
 | Styling  | CSS3 (vanilla)              |
 | Logic    | Vanilla JavaScript (ES6)    |
-| Hosting  | Static files — no build step |
-
-No external libraries, frameworks, or dependencies are used. The entire application consists of three files.
+| Database | Supabase (PostgreSQL)       |
+| Auth     | Custom (name + class)       |
 
 ---
 
@@ -21,11 +20,12 @@ No external libraries, frameworks, or dependencies are used. The entire applicat
 
 ```
 Klockspelet/
-├── index.html    # Page structure and UI elements
-├── style.css     # All styling — layout, clock, menu, game UI
-├── script.js     # Game logic, clock interaction, drag-and-drop
-└── plans/
-    └── README.md # This documentation
+├── index.html         # Page structure and UI elements
+├── style.css          # All styling — layout, clock, menu, game UI
+├── script.js          # Game logic, clock interaction, login, Supabase integration
+└── supabase/
+    ├── schema.sql     # Database schema (tables, policies)
+    └── SETUP.md       # Supabase setup instructions
 ```
 
 ---
@@ -36,19 +36,60 @@ Klockspelet/
 flowchart TD
     A[index.html] -->|links| B[style.css]
     A -->|loads| C[script.js]
-    C --> D[Main Menu]
-    D -->|Enkel| E[Simple Clock Training]
-    D -->|Tid| F[Time Challenge]
-    D -->|Problem| G[Problem Solving]
-    E --> H[generateNewTask]
-    F --> H
-    F --> I[updateTimer]
-    G --> J[generateProblemTask]
-    H --> K[checkAnswer]
-    J --> K
-    K -->|Correct| L[Level Up / Next Task]
-    K -->|Wrong| M[Try Again]
+    C --> D[Login Screen]
+    D -->|success| E[Main Menu]
+    E -->|Enkel| F[Simple Clock Training]
+    E -->|Tid| G[Time Challenge]
+    E -->|Problem| H[Problem Solving]
+    F --> I[generateNewTask]
+    G --> I
+    G --> J[updateTimer]
+    H --> K[generateProblemTask]
+    I --> L[checkAnswer]
+    K --> L
+    L -->|Correct| M[Level Up / Next Task]
+    L -->|Wrong| N[Try Again]
+    I -->|save| O[Supabase Database]
 ```
+
+---
+
+## Login System
+
+### Overview
+The app uses a simple login system where users select their class (3A-3E) and enter their name. The combination of name + class uniquely identifies each user, and all game statistics are saved to a Supabase database.
+
+### Login Flow
+1. User selects class from dropdown (3A, 3B, 3C, 3D, 3E)
+2. User enters their name
+3. System checks if this name+class combination exists in the database
+4. If exists: loads existing user profile and statistics
+5. If new: creates new profile and initializes statistics
+
+### Database Schema
+
+**profiles table:**
+| Column    | Type    | Description              |
+|-----------|---------|-------------------------|
+| id        | UUID    | Primary key             |
+| name      | TEXT    | User's name             |
+| class     | TEXT    | Class (3A-3E)           |
+| created_at | TIMESTAMP | Registration time     |
+
+**player_stats table:**
+| Column      | Type    | Description              |
+|-------------|---------|-------------------------|
+| id          | UUID    | Primary key             |
+| user_id     | UUID    | References profiles.id |
+| mode        | TEXT    | 'enkel', 'tid', 'problem' |
+| score       | INTEGER | Highest score           |
+| level       | INTEGER | Highest level reached  |
+| max_streak  | INTEGER | Highest streak achieved|
+| games_played| INTEGER | Total games played     |
+| last_played | TIMESTAMP | Last game time       |
+
+### Offline Mode
+If Supabase is not configured (SUPABASE_URL = 'DIN_SUPABASE_URL'), the app falls back to localStorage for data persistence.
 
 ---
 
@@ -94,19 +135,24 @@ The game uses a streak-based leveling system (applies to Simple and Time Challen
 
 | Function | Purpose |
 |----------|---------|
-| [`startGame(mode)`](script.js:5) | Initializes a game session for the selected mode |
-| [`updateStats()`](script.js:35) | Updates the on-screen score, streak, and level display |
-| [`showMenu()`](script.js:41) | Returns to the main menu and clears the timer |
-| [`updateTimer()`](script.js:47) | Decrements the countdown timer for Time Challenge mode |
-| [`updateClock()`](script.js:57) | Rotates the clock hands based on current `gameHours` and `gameMinutes` |
-| [`addTime(h, m)`](script.js:64) | Adds hours/minutes via the control buttons |
-| [`timeToSwedishText(h, m)`](script.js:71) | Converts a numeric time to Swedish clock-reading text |
-| [`generateNewTask()`](script.js:91) | Creates a new time-matching task for Simple/Time modes |
-| [`generateProblemTask()`](script.js:116) | Creates a word problem for Problem Solving mode |
-| [`checkAnswer()`](script.js:142) | Validates the user's clock setting against the target |
-| [`getAngle(e)`](script.js:177) | Calculates the angle from the clock center to the pointer/touch position |
-| [`startDrag(e, hand)`](script.js:187) | Initiates drag interaction on a clock hand |
-| [`doDrag(e)`](script.js:198) | Handles ongoing drag movement to update clock hands |
+| [`initDatabase()`](script.js:11) | Initializes Supabase client |
+| [`login()`](script.js:51) | Handles login with class + name |
+| [`offlineLogin()`](script.js:112) | Fallback login using localStorage |
+| [`loadUserStats()`](script.js:140) | Loads player statistics from Supabase |
+| [`saveGameResult()`](script.js:209) | Saves game results to database |
+| [`startGame(mode)`](script.js:262) | Initializes a game session for the selected mode |
+| [`updateStats()`](script.js:293) | Updates the on-screen score, streak, and level display |
+| [`showMenu()`](script.js:300) | Returns to the main menu and saves game results |
+| [`updateTimer()`](script.js:311) | Decrements the countdown timer for Time Challenge mode |
+| [`updateClock()`](script.js:326) | Rotates the clock hands based on current `gameHours` and `gameMinutes` |
+| [`addTime(h, m)`](script.js) | Adds hours/minutes via the control buttons |
+| [`timeToSwedish:333Text(h, m)`](script.js:340) | Converts a numeric time to Swedish clock-reading text |
+| [`generateNewTask()`](script.js:360) | Creates a new time-matching task for Simple/Time modes |
+| [`generateProblemTask()`](script.js:385) | Creates a word problem for Problem Solving mode |
+| [`checkAnswer()`](script.js:410) | Validates the user's clock setting against the target |
+| [`getAngle(e)`](script.js:456) | Calculates the angle from the clock center to the pointer/touch position |
+| [`startDrag(e, hand)`](script.js:466) | Initiates drag interaction on a clock hand |
+| [`doDrag(e)`](script.js:477) | Handles ongoing drag movement to update clock hands |
 
 ---
 
@@ -118,7 +164,7 @@ The analog clock supports two input methods:
 2. **Drag and drop** — Both mouse and touch events are supported. Users can grab either the hour or minute hand and drag it around the clock face.
 
 ### Drag Implementation Details
-- The angle from the clock center to the cursor is calculated using [`getAngle()`](script.js:177) with `Math.atan2`.
+- The angle from the clock center to the cursor is calculated using [`getAngle()`](script.js:456) with `Math.atan2`.
 - **Minute hand:** Snaps to 5-minute intervals (`Math.round(a/30)*30/6`).
 - **Hour hand:** Snaps to whole hours (`Math.round(a/30) || 12`).
 - Touch events use `{passive: false}` to prevent page scrolling during drag.
@@ -127,19 +173,27 @@ The analog clock supports two input methods:
 
 ## UI Structure
 
-The UI has two main states controlled by toggling the `.hidden` CSS class:
+The UI has three main states controlled by toggling the `.hidden` CSS class:
 
 ```mermaid
 stateDiagram-v2
-    [*] --> MainMenu
+    [*] --> LoginScreen
+    LoginScreen --> MainMenu: login
     MainMenu --> GameContainer: startGame
     GameContainer --> MainMenu: showMenu
     GameContainer --> GameOver: Timer expires - Time Challenge only
 ```
 
+### Login Screen (`#login-screen`)
+- Class selection dropdown (3A-3E)
+- Name input field
+- Login button
+
 ### Main Menu (`#main-menu`)
-- Title and subtitle
+- User info display (name + class)
+- Stats summary for each game mode
 - Three mode-selection buttons
+- Logout button
 
 ### Game Container (`#game-container`)
 - Back button to return to menu
@@ -163,7 +217,7 @@ stateDiagram-v2
 
 ## Swedish Time Expressions
 
-The [`timeToSwedishText()`](script.js:71) function converts times to idiomatic Swedish clock expressions:
+The [`timeToSwedishText()`](script.js:340) function converts times to idiomatic Swedish clock expressions:
 
 | Minutes | Swedish Expression | Example (3:XX) |
 |---------|-------------------|-----------------|
@@ -184,11 +238,22 @@ The [`timeToSwedishText()`](script.js:71) function converts times to idiomatic S
 
 ## Names and Activities (Problem Solving Mode)
 
-The problem-solving mode uses randomized names and activities defined in [`generateProblemTask()`](script.js:116):
+The problem-solving mode uses randomized names and activities defined in [`generateProblemTask()`](script.js:385):
 
 - **Names:** Elias, Ahmad, Rasmus, Hawbir, Kismah, Anki, Annika, Hanna G, Hanna B, Anna, Emin, Brittis, Evelina, Klas, Christian, Conny, Cecilia, Carro, Catalin, Mi, Aya, Barnabe
 - **Activities:** bada, cykla, läsa, titta på TV, träna, äta frukost, spela fotboll, ha rast, rita, spela roblox, rätta prov
 - **Durations:** 15, 30, 45, 60, or 90 minutes
+
+---
+
+## Supabase Setup
+
+See [`supabase/SETUP.md`](supabase/SETUP.md) for detailed setup instructions.
+
+### Quick Setup:
+1. Create project at [supabase.com](https://supabase.com)
+2. Run [`supabase/schema.sql`](supabase/schema.sql) in SQL Editor
+3. Copy Project URL and anon key to [`script.js`](script.js:7-8)
 
 ---
 
@@ -197,7 +262,7 @@ The problem-solving mode uses randomized names and activities defined in [`gener
 - **Reset clock button** — Currently there is no way to reset the clock hands to 12:00 without reloading.
 - **Subtract time buttons** — Only additive buttons exist; users cannot subtract hours or minutes.
 - **Sound effects** — No audio feedback for correct/incorrect answers.
-- **Score persistence** — Scores are lost on page reload; could use `localStorage`.
+- **Admin dashboard** — Teachers could view all students' statistics.
 - **Accessibility** — No ARIA labels or keyboard navigation for the clock.
 - **Responsive design** — The 300px fixed clock size may be too large or small on some devices.
 - **Minute hand drag precision** — The minute hand snaps to 5-minute intervals via angle rounding, which can feel imprecise at certain positions.

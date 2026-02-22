@@ -68,6 +68,68 @@
         <button class="logout-btn" onclick="logout()">Logga ut</button>
     </div>
 
+    <!-- Admin Dashboard -->
+    <div id="admin-dashboard" class="hidden">
+        <h1 class="huvudrubrik">📊 Adminsida</h1>
+        <p class="underrubrik">Statistik för alla elever</p>
+
+        <div id="admin-controls">
+            <label for="admin-class-filter">Filtrera klass:</label>
+            <select id="admin-class-filter" onchange="filterAdminStats()">
+                <option value="">Alla klasser</option>
+                <option value="3A">3A</option>
+                <option value="3B">3B</option>
+                <option value="3C">3C</option>
+                <option value="3D">3D</option>
+                <option value="3E">3E</option>
+            </select>
+
+            <label for="admin-mode-filter">Filtrera spelläge:</label>
+            <select id="admin-mode-filter" onchange="filterAdminStats()">
+                <option value="">Alla lägen</option>
+                <option value="enkel">🧠 Enkel</option>
+                <option value="tid">⏱️ Tid</option>
+                <option value="problem">🕵️ Problem</option>
+            </select>
+        </div>
+
+        <div id="admin-summary">
+            <div class="admin-summary-card">
+                <span class="admin-summary-label">Antal elever</span>
+                <span class="admin-summary-value" id="admin-total-students">0</span>
+            </div>
+            <div class="admin-summary-card">
+                <span class="admin-summary-label">Totalt spelade</span>
+                <span class="admin-summary-value" id="admin-total-games">0</span>
+            </div>
+            <div class="admin-summary-card">
+                <span class="admin-summary-label">Högsta poäng</span>
+                <span class="admin-summary-value" id="admin-top-score">0</span>
+            </div>
+        </div>
+
+        <div id="admin-table-container">
+            <table id="admin-stats-table">
+                <thead>
+                    <tr>
+                        <th onclick="sortAdminTable('name')">Namn ⇅</th>
+                        <th onclick="sortAdminTable('class')">Klass ⇅</th>
+                        <th onclick="sortAdminTable('mode')">Läge ⇅</th>
+                        <th onclick="sortAdminTable('score')">Poäng ⇅</th>
+                        <th onclick="sortAdminTable('level')">Nivå ⇅</th>
+                        <th onclick="sortAdminTable('max_streak')">Streak ⇅</th>
+                        <th onclick="sortAdminTable('games_played')">Spelade ⇅</th>
+                        <th onclick="sortAdminTable('last_played')">Senast ⇅</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-stats-body">
+                </tbody>
+            </table>
+        </div>
+
+        <button class="logout-btn" onclick="adminLogout()">Logga ut</button>
+    </div>
+
     <div id="game-container" class="hidden">
         
         <button class="back-btn" onclick="showMenu()">🔙 Tillbaka till menyn</button>
