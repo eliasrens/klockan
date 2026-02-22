@@ -248,6 +248,8 @@ async function logout() {
     document.getElementById('login-screen').classList.remove('hidden');
     document.getElementById('name-input').value = '';
     document.getElementById('class-select').value = '';
+    document.getElementById('login-loading').textContent = '';
+    document.getElementById('login-error').textContent = '';
 }
 
 // --- SPARSTATISTIK ---
