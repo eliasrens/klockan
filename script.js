@@ -457,12 +457,19 @@ function checkAnswer() {
     let cH = gameHours % 12 || 12;
     let tH = targetHours % 12 || 12;
     if (cH === tH && gameMinutes === targetMinutes) {
-        // Poängsystem för problemläge: 2 poäng på nivå 1, +1 poäng extra per nivå
+        // Poängsystem per läge
+        let pointsEarned = 0;
         if (currentMode === 'problem') {
-            score += (level + 1); // Nivå 1 = 2p, Nivå 2 = 3p, Nivå 3 = 4p, Nivå 4 = 5p
+            // Problemlösning: 2 poäng på nivå 1, +1 poäng extra per nivå
+            pointsEarned = level + 1;
+        } else if (currentMode === 'tid') {
+            // Tidsutmaning: 2 poäng på nivå 1, +2 poäng extra per nivå (upp till nivå 20)
+            pointsEarned = level * 2;
         } else {
-            score++;
+            // Enkel klockträning: 1 poäng på nivå 1, +1 poäng extra per nivå
+            pointsEarned = level;
         }
+        score += pointsEarned;
         streak++;
         
         // Spåra max streak för detta spel
@@ -472,14 +479,17 @@ function checkAnswer() {
         
         document.getElementById("meddelande").style.color = "#00695C";
         if (currentMode === 'problem') {
-            let pointsEarned = level + 1;
             document.getElementById("meddelande").innerText = `🌟 Rätt! +${pointsEarned} poäng! 🌟`;
+        } else if (currentMode === 'tid') {
+            document.getElementById("meddelande").innerText = `🌟 Rätt! +${pointsEarned} poäng! +3 sek! 🌟`;
+            timeLeft += 3;
         } else {
-            document.getElementById("meddelande").innerText = (currentMode === 'tid') ? "🌟 Rätt! +3 sek! 🌟" : "🌟 Helt rätt! 🌟";
+            document.getElementById("meddelande").innerText = `🌟 Rätt! +${pointsEarned} poäng! 🌟`;
         }
-        if (currentMode === 'tid') timeLeft += 3;
         
-        if (streak >= 5 && level < 4) { 
+        // Level-up villkor per läge
+        let maxLevel = (currentMode === 'tid') ? 20 : 4;
+        if (streak >= 5 && level < maxLevel) { 
             level++; 
             streak = 0; 
             document.getElementById("meddelande").innerText = "🎉 NIVÅ UPPHÖJD! 🎉";
