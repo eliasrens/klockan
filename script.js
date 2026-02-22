@@ -457,7 +457,13 @@ function checkAnswer() {
     let cH = gameHours % 12 || 12;
     let tH = targetHours % 12 || 12;
     if (cH === tH && gameMinutes === targetMinutes) {
-        score++; streak++;
+        // Poängsystem för problemläge: 2 poäng på nivå 1, +1 poäng extra per nivå
+        if (currentMode === 'problem') {
+            score += (level + 1); // Nivå 1 = 2p, Nivå 2 = 3p, Nivå 3 = 4p, Nivå 4 = 5p
+        } else {
+            score++;
+        }
+        streak++;
         
         // Spåra max streak för detta spel
         if (streak > maxStreakThisGame) {
@@ -465,7 +471,12 @@ function checkAnswer() {
         }
         
         document.getElementById("meddelande").style.color = "#00695C";
-        document.getElementById("meddelande").innerText = (currentMode === 'tid') ? "🌟 Rätt! +3 sek! 🌟" : "🌟 Helt rätt! 🌟";
+        if (currentMode === 'problem') {
+            let pointsEarned = level + 1;
+            document.getElementById("meddelande").innerText = `🌟 Rätt! +${pointsEarned} poäng! 🌟`;
+        } else {
+            document.getElementById("meddelande").innerText = (currentMode === 'tid') ? "🌟 Rätt! +3 sek! 🌟" : "🌟 Helt rätt! 🌟";
+        }
         if (currentMode === 'tid') timeLeft += 3;
         
         if (streak >= 5 && level < 4) { 
