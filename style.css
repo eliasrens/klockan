@@ -1,6 +1,85 @@
 body { background-color: #E0F2F1; font-family: 'Segoe UI', sans-serif; text-align: center; color: #37474F; margin: 0; padding: 20px; }
 .hidden { display: none !important; }
 
+/* LOGIN SCREEN */
+#login-screen { max-width: 400px; margin: 0 auto; }
+
+#login-form {
+    background-color: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    margin-top: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    font-size: 18px;
+    font-weight: bold;
+    color: #00695C;
+    margin-bottom: 8px;
+}
+
+.form-group select,
+.form-group input {
+    width: 100%;
+    padding: 12px 15px;
+    font-size: 16px;
+    border: 2px solid #B2DFDB;
+    border-radius: 10px;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+}
+
+.form-group select:focus,
+.form-group input:focus {
+    outline: none;
+    border-color: #00695C;
+}
+
+#login-btn {
+    width: 100%;
+    padding: 15px;
+    font-size: 20px;
+    background-color: #00695C;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.2s;
+    margin-top: 10px;
+}
+
+#login-btn:hover {
+    background-color: #004D40;
+    transform: scale(1.02);
+}
+
+.error-message {
+    color: #D32F2F;
+    font-size: 16px;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+/* USER INFO IN MENU */
+#user-info {
+    background-color: #FFB300;
+    color: #37474F;
+    padding: 12px 25px;
+    border-radius: 25px;
+    display: inline-block;
+    margin-bottom: 25px;
+    font-size: 18px;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
 /* MENYN */
 .huvudrubrik { color: #00695C; font-size: 48px; margin-top: 50px; }
 .underrubrik { font-size: 24px; color: #546E7A; margin-bottom: 40px; }
@@ -22,7 +101,7 @@ body { background-color: #E0F2F1; font-family: 'Segoe UI', sans-serif; text-alig
 .hour-hand { width: 10px; height: 80px; } 
 .minute-hand { width: 6px; height: 120px; z-index: 6; }
 
-/* SIFFRORNA - HÄR ÄR FIXEN */
+/* SIFFRORNA */
 .number { 
     position: absolute; 
     font-size: 24px; 
@@ -72,3 +151,57 @@ body { background-color: #E0F2F1; font-family: 'Segoe UI', sans-serif; text-alig
 .controls { margin-top: 10px; margin-bottom: 50px; }
 button { background-color: #00695C; color: white; border: none; padding: 15px 25px; font-size: 18px; border-radius: 8px; margin: 5px; cursor: pointer; }
 .check-btn { background-color: #FFB300 !important; color: #37474F !important; font-weight: bold; padding: 15px 40px !important; }
+
+/* STATS SUMMARY */
+#stats-summary {
+    background-color: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 400px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.stats-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 15px;
+    border-bottom: 1px solid #E0E0E0;
+    font-size: 16px;
+}
+
+.stats-row:last-child {
+    border-bottom: none;
+}
+
+.mode-label {
+    font-weight: bold;
+    color: #00695C;
+}
+
+/* LOGOUT BUTTON */
+.logout-btn {
+    display: block;
+    width: 90%;
+    max-width: 400px;
+    margin: 30px auto;
+    padding: 12px;
+    font-size: 16px;
+    background-color: #78909C;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.logout-btn:hover {
+    background-color: #546E7A;
+}
+
+/* LOADING MESSAGE */
+.loading-message {
+    color: #00695C;
+    font-size: 14px;
+    margin-top: 10px;
+}

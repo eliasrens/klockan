@@ -5,16 +5,67 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Klockspelet</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     
-    <div id="main-menu">
+    <!-- Login Screen -->
+    <div id="login-screen">
+        <h1 class="huvudrubrik">Klockspelet</h1>
+        <p class="underrubrik">Välj din klass och skriv ditt namn!</p>
+        
+        <div id="login-form">
+            <div class="form-group">
+                <label for="class-select">Klass:</label>
+                <select id="class-select">
+                    <option value="">Välj klass...</option>
+                    <option value="3A">3A</option>
+                    <option value="3B">3B</option>
+                    <option value="3C">3C</option>
+                    <option value="3D">3D</option>
+                    <option value="3E">3E</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="name-input">Namn:</label>
+                <input type="text" id="name-input" placeholder="Skriv ditt namn..." maxlength="30">
+            </div>
+            
+            <button id="login-btn" onclick="login()">Starta spelet!</button>
+            <p id="login-error" class="error-message"></p>
+            <p id="login-loading" class="loading-message"></p>
+        </div>
+    </div>
+
+    <div id="main-menu" class="hidden">
         <h1 class="huvudrubrik">Klockspelet</h1>
         <p class="underrubrik">Välj hur du vill spela!</p>
+        
+        <div id="user-info">
+            <span id="user-display"></span>
+        </div>
+        
+        <div id="stats-summary">
+            <div class="stats-row">
+                <span class="mode-label">🧠 Enkel:</span>
+                <span id="stats-enkel">Poäng: 0 | Högsta streak: 0</span>
+            </div>
+            <div class="stats-row">
+                <span class="mode-label">⏱️ Tid:</span>
+                <span id="stats-tid">Poäng: 0 | Högsta streak: 0</span>
+            </div>
+            <div class="stats-row">
+                <span class="mode-label">🕵️ Problem:</span>
+                <span id="stats-problem">Poäng: 0 | Högsta streak: 0</span>
+            </div>
+        </div>
         
         <button class="menu-btn" onclick="startGame('enkel')">🧠 Enkel klockträning</button>
         <button class="menu-btn" onclick="startGame('tid')">⏱️ Tidsutmaning</button>
         <button class="menu-btn" onclick="startGame('problem')">🕵️ Problemlösning</button>
+        
+        <button class="logout-btn" onclick="logout()">Logga ut</button>
     </div>
 
     <div id="game-container" class="hidden">
@@ -34,7 +85,7 @@
         <div id="game-play-area">
             <div id="uppdrag-container">
                 <span class="instruction-text" id="instruction-text">Ställ klockan på:</span><br>
-                <div id="uppdrag-tid" class="target-time-badge">Laddar...</div>
+                <div id="uppdrag-tid" class="target-time-badge">Ladding...</div>
             </div>
             
             <p id="meddelande"></p>

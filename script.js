@@ -1,10 +1,275 @@
+// ========================================
+// KLOCKSPLET - Supabase Version
+// ========================================
+
+// --- KONFIGURATION ---
+// Ersätt dessa med dina egna Supabase-uppgifter
+const SUPABASE_URL = 'https://astapyrfupqenhlresxg.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzdGFweXJmdXBxZW5obHJlc3hnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3NjQwODMsImV4cCI6MjA4NzM0MDA4M30.XKdkbDwtDcQPAKduwUlBiiMuklYct5rYvmVW-ycCKnM';
+
+// --- GLOBALA VARIABLER ---
 let gameHours = 12, gameMinutes = 0, targetHours = 0, targetMinutes = 0;
 let score = 0, streak = 0, level = 1, currentMode = ""; 
 let timeLeft = 30, timerInterval;
 
+// Användarvariabler
+let currentUser = null;
+let userStats = {};
+let supabaseClient = null;
+
+// Spelvariabler för att spåra maxvärden
+let maxStreakThisGame = 0;
+let maxLevelThisGame = 1;
+
+// --- INITIALISERING ---
+document.addEventListener('DOMContentLoaded', async () => {
+    // Kolla om användaren redan är inloggad
+    const savedUser = localStorage.getItem('klockspelet_user');
+    
+    if (savedUser && SUPABASE_URL !== 'DIN_SUPABASE_URL') {
+        try {
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            currentUser = JSON.parse(savedUser);
+            await loadUserStats();
+            showMainMenu();
+        } catch (error) {
+            console.error("Fel vid inloggning:", error);
+            localStorage.removeItem('klockspelet_user');
+        }
+    } else if (SUPABASE_URL === 'DIN_SUPABASE_URL') {
+        // Offline-läge (fallback om ingen Supabase är konfigurerad)
+        document.getElementById('login-loading').textContent = 'Offline-läge - sparas lokalt';
+        setTimeout(() => {
+            document.getElementById('login-loading').textContent = '';
+        }, 2000);
+    }
+    
+    updateClock();
+});
+
+// --- INLOGGNING ---
+async function login() {
+    const classSelect = document.getElementById('class-select');
+    const nameInput = document.getElementById('name-input');
+    const errorMessage = document.getElementById('login-error');
+    const loadingMessage = document.getElementById('login-loading');
+    
+    const userClass = classSelect.value;
+    const userName = nameInput.value.trim();
+    
+    // Validering
+    if (!userClass) {
+        errorMessage.textContent = "Välj en klass!";
+        return;
+    }
+    
+    if (!userName) {
+        errorMessage.textContent = "Skriv ditt namn!";
+        return;
+    }
+    
+    if (userName.length < 2) {
+        errorMessage.textContent = "Namnet måste vara minst 2 bokstäver!";
+        return;
+    }
+    
+    errorMessage.textContent = "";
+    loadingMessage.textContent = "Loggar in...";
+    
+    if (SUPABASE_URL === 'DIN_SUPABASE_URL') {
+        // Offline-läge - använd localStorage
+        offlineLogin(userClass, userName);
+    } else {
+        try {
+            // Skapa Supabase-klient om den inte redan finns
+            if (!supabaseClient) {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            }
+            
+            // Försök logga in med Supabase (anonym inloggning)
+            const { data, error } = await supabaseClient.auth.signInAnonymously({
+                data: { name: userName, class: userClass }
+            });
+            
+            if (error) throw error;
+            
+            currentUser = {
+                id: data.user.id,
+                name: userName,
+                class: userClass
+            };
+            
+            // Spara till localStorage
+            localStorage.setItem('klockspelet_user', JSON.stringify(currentUser));
+            
+            // Ladda statistik
+            await loadUserStats();
+            
+            showMainMenu();
+        } catch (error) {
+            console.error("Inloggningsfel:", error);
+            errorMessage.textContent = "Kunde inte ansluta till servern. Försök igen.";
+            loadingMessage.textContent = "";
+        }
+    }
+}
+
+// Offline-inloggning (fallback)
+function offlineLogin(userClass, userName) {
+    // Hämta eller skapa offline-användare
+    let offlineUsers = JSON.parse(localStorage.getItem('klockspelet_offline_users') || '[]');
+    let user = offlineUsers.find(u => u.name === userName && u.class === userClass);
+    
+    if (!user) {
+        user = {
+            id: 'offline_' + Date.now(),
+            name: userName,
+            class: userClass,
+            stats: {
+                enkel: { score: 0, level: 1, max_streak: 0, games_played: 0 },
+                tid: { score: 0, level: 1, max_streak: 0, games_played: 0 },
+                problem: { score: 0, level: 1, max_streak: 0, games_played: 0 }
+            }
+        };
+        offlineUsers.push(user);
+        localStorage.setItem('klockspelet_offline_users', JSON.stringify(offlineUsers));
+    }
+    
+    currentUser = user;
+    userStats = user.stats;
+    
+    document.getElementById('login-loading').textContent = '';
+    showMainMenu();
+}
+
+// Ladda användarstatistik från Supabase
+async function loadUserStats() {
+    if (SUPABASE_URL === 'DIN_SUPABASE_URL') return;
+    
+    try {
+        const { data, error } = await supabaseClient
+            .from('player_stats')
+            .select('*')
+            .eq('user_id', currentUser.id);
+        
+        if (error) throw error;
+        
+        // Omvandla till objekt
+        userStats = {};
+        data.forEach(stat => {
+            userStats[stat.mode] = stat;
+        });
+        
+        updateStatsSummary();
+    } catch (error) {
+        console.error("Fel vid laddning av statistik:", error);
+    }
+}
+
+// Uppdatera statistiksammanfattning i menyn
+function updateStatsSummary() {
+    const modes = ['enkel', 'tid', 'problem'];
+    const modeNames = {
+        enkel: 'stats-enkel',
+        tid: 'stats-tid',
+        problem: 'stats-problem'
+    };
+    
+    modes.forEach(mode => {
+        const stats = userStats[mode];
+        const element = document.getElementById(modeNames[mode]);
+        if (stats) {
+            element.textContent = `Poäng: ${stats.score || 0} | Högsta streak: ${stats.max_streak || 0}`;
+        } else {
+            element.textContent = 'Poäng: 0 | Högsta streak: 0';
+        }
+    });
+}
+
+// Visa huvudmeny
+function showMainMenu() {
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('main-menu').classList.remove('hidden');
+    
+    document.getElementById('user-display').textContent = `👤 ${currentUser.name} (${currentUser.class})`;
+    
+    updateStatsSummary();
+}
+
+// Logga ut
+async function logout() {
+    if (supabaseClient) {
+        await supabaseClient.auth.signOut();
+    }
+    localStorage.removeItem('klockspelet_user');
+    currentUser = null;
+    userStats = {};
+    
+    document.getElementById('main-menu').classList.add('hidden');
+    document.getElementById('login-screen').classList.remove('hidden');
+    document.getElementById('name-input').value = '';
+    document.getElementById('class-select').value = '';
+}
+
+// --- SPARSTATISTIK ---
+async function saveGameResult(mode, finalScore, maxLvl, maxStrk) {
+    if (!currentUser) return;
+    
+    // Uppdatera lokalt först (direkt feedback)
+    if (!userStats[mode]) {
+        userStats[mode] = { score: 0, level: 1, max_streak: 0, games_played: 0 };
+    }
+    
+    const stats = userStats[mode];
+    stats.score = Math.max(stats.score || 0, finalScore);
+    stats.max_streak = Math.max(stats.max_streak || 0, maxStrk);
+    stats.level = Math.max(stats.level || 1, maxLvl);
+    stats.games_played = (stats.games_played || 0) + 1;
+    
+    updateStatsSummary();
+    
+    if (SUPABASE_URL === 'DIN_SUPABASE_URL') {
+        // Spara offline
+        saveOfflineStats();
+    } else {
+        // Spara till Supabase
+        try {
+            const { error } = await supabaseClient
+                .from('player_stats')
+                .upsert({
+                    user_id: currentUser.id,
+                    mode: mode,
+                    score: stats.score,
+                    level: stats.level,
+                    max_streak: stats.max_streak,
+                    games_played: stats.games_played,
+                    last_played: new Date().toISOString()
+                }, { onConflict: 'user_id, mode' });
+            
+            if (error) throw error;
+        } catch (error) {
+            console.error("Fel vid sparande:", error);
+        }
+    }
+}
+
+// Spara statistik offline
+function saveOfflineStats() {
+    let offlineUsers = JSON.parse(localStorage.getItem('klockspelet_offline_users') || '[]');
+    const userIndex = offlineUsers.findIndex(u => u.id === currentUser.id);
+    
+    if (userIndex !== -1) {
+        offlineUsers[userIndex].stats = userStats;
+        localStorage.setItem('klockspelet_offline_users', JSON.stringify(offlineUsers));
+    }
+}
+
+// --- SPELLOGIK ---
 function startGame(mode) {
     currentMode = mode;
     score = 0; streak = 0; level = 1;
+    maxStreakThisGame = 0;
+    maxLevelThisGame = 1;
     updateStats();
     document.getElementById("meddelande").innerText = "";
     document.getElementById("main-menu").classList.add("hidden");
@@ -21,7 +286,6 @@ function startGame(mode) {
         timerInterval = setInterval(updateTimer, 1000);
         generateNewTask();
     } else if (currentMode === 'problem') {
-        // HÄR TOG VI BORT TEXTEN:
         document.getElementById("instruction-text").innerText = ""; 
         document.getElementById("timer-container").classList.add("hidden");
         generateProblemTask();
@@ -39,6 +303,11 @@ function updateStats() {
 }
 
 function showMenu() {
+    // Spara spelets resultat innan vi går tillbaka till menyn
+    if (currentUser && currentMode && score > 0) {
+        saveGameResult(currentMode, score, maxLevelThisGame, maxStreakThisGame);
+    }
+    
     clearInterval(timerInterval);
     document.getElementById("game-container").classList.add("hidden");
     document.getElementById("main-menu").classList.remove("hidden");
@@ -51,6 +320,11 @@ function updateTimer() {
         clearInterval(timerInterval);
         document.getElementById("meddelande").innerText = `⏰ TIDEN ÄR UTE! Poäng: ${score} ⏰`;
         document.getElementById("game-play-area").classList.add("hidden");
+        
+        // Spara spelets resultat
+        if (currentUser) {
+            saveGameResult(currentMode, score, maxLevelThisGame, maxStreakThisGame);
+        }
     }
 }
 
@@ -102,7 +376,7 @@ function generateNewTask() {
     }
 
     const badge = document.getElementById("uppdrag-tid");
-    badge.style.fontSize = "32px"; // Återställ storleken för vanliga uppdrag
+    badge.style.fontSize = "32px";
     if (Math.random() < 0.5) {
         let txt = timeToSwedishText(targetHours, targetMinutes);
         badge.innerText = txt.charAt(0).toUpperCase() + txt.slice(1);
@@ -127,7 +401,6 @@ function generateProblemTask() {
 
     const namn = ["Elias", "Ahmad", "Rasmus", "Hawbir", "Kismah", "Anki", "Annika", "Hanna G", "Hanna B", "Anna", "Emin", "Brittis", "Evelina", "Klas", "Christian", "Conny", "Cecilia", "Carro", "Catalin", "Mi", "Aya", "Barnabe"];
     
-    // Här är de grammatiskt korrekta formerna (att-form):
     const aktivitet = ["bada", "cykla", "läsa", "titta på TV", "träna", "äta frukost", "spela fotboll", "ha rast", "rita", "spela roblox", "rätta prov"];
     
     let valtNamn = namn[Math.floor(Math.random() * namn.length)];
@@ -144,6 +417,12 @@ function checkAnswer() {
     let tH = targetHours % 12 || 12;
     if (cH === tH && gameMinutes === targetMinutes) {
         score++; streak++;
+        
+        // Spåra max streak för detta spel
+        if (streak > maxStreakThisGame) {
+            maxStreakThisGame = streak;
+        }
+        
         document.getElementById("meddelande").style.color = "#00695C";
         document.getElementById("meddelande").innerText = (currentMode === 'tid') ? "🌟 Rätt! +3 sek! 🌟" : "🌟 Helt rätt! 🌟";
         if (currentMode === 'tid') timeLeft += 3;
@@ -152,6 +431,11 @@ function checkAnswer() {
             level++; 
             streak = 0; 
             document.getElementById("meddelande").innerText = "🎉 NIVÅ UPPHÖJD! 🎉";
+            
+            // Spåra max level för detta spel
+            if (level > maxLevelThisGame) {
+                maxLevelThisGame = level;
+            }
         }
         
         updateStats();
@@ -169,7 +453,7 @@ function checkAnswer() {
     }
 }
 
-// DRA OCH SLÄPP (Mus + Touch)
+// --- DRAG AND DROP (Mouse + Touch) ---
 let isDragging = false;
 let activeHand = null;
 const clock = document.querySelector('.clock');
