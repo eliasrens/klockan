@@ -214,15 +214,24 @@ function updateStatsSummary() {
         problem: 'stats-problem'
     };
     
+    let totalScore = 0;
+    
     modes.forEach(mode => {
         const stats = userStats[mode];
         const element = document.getElementById(modeNames[mode]);
         if (stats) {
             element.textContent = `Poäng: ${stats.score || 0} | Högsta streak: ${stats.max_streak || 0}`;
+            totalScore += stats.score || 0;
         } else {
             element.textContent = 'Poäng: 0 | Högsta streak: 0';
         }
     });
+    
+    // Uppdatera totalpoäng
+    const totalElement = document.getElementById('stats-total');
+    if (totalElement) {
+        totalElement.textContent = `Poäng totalt: ${totalScore}`;
+    }
 }
 
 // Visa huvudmeny
@@ -609,6 +618,9 @@ async function adminLogin() {
                 });
             }
         });
+        
+        // Beräkna totalpoäng för varje elev
+        calculateTotalScores();
 
         loadingMessage.textContent = '';
         document.getElementById('login-screen').classList.add('hidden');
@@ -630,10 +642,37 @@ function filterAdminStats() {
         if (modeFilter && row.mode !== modeFilter) return false;
         return true;
     });
+    
+    // Beräkna om totalpoäng efter filtrering
+    calculateTotalScores();
 
     sortAdminData();
     renderAdminTable();
     renderAdminSummary();
+}
+
+// Beräkna totalpoäng för varje elev
+function calculateTotalScores() {
+    // Gruppera data efter elev (namn + klass)
+    const studentScores = {};
+    
+    allAdminData.forEach(row => {
+        const key = row.name + '|' + row.class;
+        if (!studentScores[key]) {
+            studentScores[key] = {
+                name: row.name,
+                class: row.class,
+                totalScore: 0
+            };
+        }
+        studentScores[key].totalScore += row.score;
+    });
+    
+    // Lägg till totalpoäng i varje rad
+    allAdminData.forEach(row => {
+        const key = row.name + '|' + row.class;
+        row.totalScore = studentScores[key].totalScore;
+    });
 }
 
 function sortAdminTable(key) {
@@ -664,6 +703,26 @@ function sortAdminData() {
         if (valA > valB) return adminSortAsc ? 1 : -1;
         return 0;
     });
+    
+    // Sortera efter totalpoäng kräver att vi först beräknar om den
+    if (adminSortKey === 'totalScore') {
+        // Gruppera och sortera
+        const studentTotals = {};
+        filteredAdminData.forEach(row => {
+            const key = row.name + '|' + row.class;
+            if (!studentTotals[key]) {
+                studentTotals[key] = row.totalScore;
+            }
+        });
+        
+        filteredAdminData.sort((a, b) => {
+            const keyA = a.name + '|' + a.class;
+            const keyB = b.name + '|' + b.class;
+            const scoreA = studentTotals[keyA] || 0;
+            const scoreB = studentTotals[keyB] || 0;
+            return adminSortAsc ? scoreA - scoreB : scoreB - scoreA;
+        });
+    }
 }
 
 function renderAdminTable() {
@@ -671,7 +730,7 @@ function renderAdminTable() {
     const modeLabels = { enkel: '🧠 Enkel', tid: '⏱️ Tid', problem: '🕵️ Problem' };
 
     if (filteredAdminData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;color:#999;">Ingen data hittades</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:20px;color:#999;">Ingen data hittades</td></tr>';
         return;
     }
 
@@ -684,6 +743,7 @@ function renderAdminTable() {
             <td>${escapeHtml(row.class)}</td>
             <td><span class="mode-badge ${row.mode}">${modeLabels[row.mode] || row.mode}</span></td>
             <td>${row.score}</td>
+            <td><strong>${row.totalScore || 0}</strong></td>
             <td>${row.level}</td>
             <td>${row.max_streak}</td>
             <td>${row.games_played}</td>
@@ -699,8 +759,18 @@ function renderAdminSummary() {
     const totalGames = filteredAdminData.reduce((sum, r) => sum + r.games_played, 0);
     document.getElementById('admin-total-games').textContent = totalGames;
 
-    const topScore = filteredAdminData.reduce((max, r) => Math.max(max, r.score), 0);
-    document.getElementById('admin-top-score').textContent = topScore;
+    // Beräkna högsta totalpoäng bland alla elever
+    const studentScores = {};
+    filteredAdminData.forEach(row => {
+        const key = row.name + '|' + row.class;
+        if (!studentScores[key]) {
+            studentScores[key] = 0;
+        }
+        studentScores[key] += row.score;
+    });
+    
+    const topTotalScore = Object.values(studentScores).reduce((max, score) => Math.max(max, score), 0);
+    document.getElementById('admin-top-score').textContent = topTotalScore;
 }
 
 function adminLogout() {

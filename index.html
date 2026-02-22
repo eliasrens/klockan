@@ -47,6 +47,10 @@
         </div>
         
         <div id="stats-summary">
+            <div class="stats-row total-score">
+                <span class="mode-label">🏆 Poäng totalt:</span>
+                <span id="stats-total">Poäng totalt: 0</span>
+            </div>
             <div class="stats-row">
                 <span class="mode-label">🧠 Enkel:</span>
                 <span id="stats-enkel">Poäng: 0 | Högsta streak: 0</span>
@@ -116,6 +120,7 @@
                         <th onclick="sortAdminTable('class')">Klass ⇅</th>
                         <th onclick="sortAdminTable('mode')">Läge ⇅</th>
                         <th onclick="sortAdminTable('score')">Poäng ⇅</th>
+                        <th onclick="sortAdminTable('totalScore')">Poäng totalt ⇅</th>
                         <th onclick="sortAdminTable('level')">Nivå ⇅</th>
                         <th onclick="sortAdminTable('max_streak')">Streak ⇅</th>
                         <th onclick="sortAdminTable('games_played')">Spelade ⇅</th>
@@ -174,6 +179,13 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/init.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/stats.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/tasks.js"></script>
+    <script src="js/interactions.js"></script>
+    <script src="js/admin.js"></script>
 </body>
 </html>

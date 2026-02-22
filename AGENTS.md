@@ -22,7 +22,15 @@
 Klockspelet/
 ├── index.html         # Page structure and UI elements
 ├── style.css          # All styling — layout, clock, menu, game UI
-├── script.js          # Game logic, clock interaction, login, Supabase integration
+├── js/
+│   ├── config.js      # Configuration and global variables
+│   ├── init.js        # DOMContentLoaded initialization
+│   ├── auth.js        # Login, logout, offline authentication
+│   ├── stats.js       # User statistics management
+│   ├── game.js        # Game logic, timer, clock display
+│   ├── tasks.js       # Task generation and answer checking
+│   ├── interactions.js # Drag & drop clock interaction
+│   └── admin.js       # Admin dashboard
 └── supabase/
     ├── schema.sql     # Database schema (tables, policies)
     └── SETUP.md       # Supabase setup instructions
@@ -35,8 +43,9 @@ Klockspelet/
 ```mermaid
 flowchart TD
     A[index.html] -->|links| B[style.css]
-    A -->|loads| C[script.js]
-    C --> D[Login Screen]
+    A -->|loads| C[js/]
+    C -->|imports| D[config.js]
+    C --> E[Login Screen]
     D -->|success| E[Main Menu]
     E -->|Enkel| F[Simple Clock Training]
     E -->|Tid| G[Time Challenge]
@@ -131,28 +140,67 @@ The game uses a streak-based leveling system (applies to Simple and Time Challen
 
 ---
 
-## Key Functions in [`script.js`](script.js)
+## Key Functions by Module
 
 | Function | Purpose |
 |----------|---------|
-| [`initDatabase()`](script.js:11) | Initializes Supabase client |
-| [`login()`](script.js:51) | Handles login with class + name |
-| [`offlineLogin()`](script.js:112) | Fallback login using localStorage |
-| [`loadUserStats()`](script.js:140) | Loads player statistics from Supabase |
-| [`saveGameResult()`](script.js:209) | Saves game results to database |
-| [`startGame(mode)`](script.js:262) | Initializes a game session for the selected mode |
-| [`updateStats()`](script.js:293) | Updates the on-screen score, streak, and level display |
-| [`showMenu()`](script.js:300) | Returns to the main menu and saves game results |
-| [`updateTimer()`](script.js:311) | Decrements the countdown timer for Time Challenge mode |
-| [`updateClock()`](script.js:326) | Rotates the clock hands based on current `gameHours` and `gameMinutes` |
-| [`addTime(h, m)`](script.js) | Adds hours/minutes via the control buttons |
-| [`timeToSwedish:333Text(h, m)`](script.js:340) | Converts a numeric time to Swedish clock-reading text |
-| [`generateNewTask()`](script.js:360) | Creates a new time-matching task for Simple/Time modes |
-| [`generateProblemTask()`](script.js:385) | Creates a word problem for Problem Solving mode |
-| [`checkAnswer()`](script.js:410) | Validates the user's clock setting against the target |
-| [`getAngle(e)`](script.js:456) | Calculates the angle from the clock center to the pointer/touch position |
-| [`startDrag(e, hand)`](script.js:466) | Initiates drag interaction on a clock hand |
-| [`doDrag(e)`](script.js:477) | Handles ongoing drag movement to update clock hands |
+### config.js
+| Function | Purpose |
+|----------|--------|
+| `SUPABASE_URL` | Supabase project URL |
+| `SUPABASE_ANON_KEY` | Supabase anon key |
+| Global variables | `gameHours`, `gameMinutes`, `score`, `streak`, `level`, etc. |
+
+### init.js
+| Function | Purpose |
+|----------|--------|
+| `DOMContentLoaded` listener | Initializes app on page load |
+
+### auth.js
+| Function | Purpose |
+|----------|--------|
+| [`login()`](js/auth.js:51) | Handles login with class + name |
+| [`offlineLogin()`](js/auth.js:112) | Fallback login using localStorage |
+| [`logout()`](js/auth.js:156) | Logs out the current user |
+| [`showMainMenu()`](js/auth.js:166) | Shows the main menu after login |
+### stats.js
+| Function | Purpose |
+|----------|--------|
+| [`loadUserStats()`](js/stats.js:19) | Loads player statistics from Supabase |
+| [`updateStatsSummary()`](js/stats.js:44) | Updates stats display in menu |
+| [`saveGameResult()`](js/stats.js:79) | Saves game results to database |
+| [`saveOfflineStats()`](js/stats.js:119) | Saves stats to localStorage |
+### game.js
+| Function | Purpose |
+|----------|--------|
+| [`startGame(mode)`](js/game.js:19) | Initializes a game session for the selected mode |
+| [`updateStats()`](js/game.js:52) | Updates the on-screen score, streak, and level display |
+| [`showMenu()`](js/game.js:58) | Returns to the main menu and saves game results |
+| [`updateTimer()`](js/game.js:68) | Decrements the countdown timer for Time Challenge mode |
+| [`updateClock()`](js/game.js:85) | Rotates the clock hands based on current `gameHours` and `gameMinutes` |
+| [`addTime(h, m)`](js/game.js:93) | Adds hours/minutes via the control buttons |
+### tasks.js
+| Function | Purpose |
+|----------|--------|
+| [`timeToSwedishText(h, m)`](js/tasks.js:20) | Converts a numeric time to Swedish clock-reading text |
+| [`generateNewTask()`](js/tasks.js:49) | Creates a new time-matching task for Simple/Time modes |
+| [`generateProblemTask()`](js/tasks.js:75) | Creates a word problem for Problem Solving mode |
+| [`checkAnswer()`](js/tasks.js:109) | Validates the user's clock setting against the target |
+### interactions.js
+| Function | Purpose |
+|----------|--------|
+| [`getAngle(e)`](js/interactions.js:11) | Calculates the angle from the clock center to the pointer/touch position |
+| [`startDrag(e, hand)`](js/interactions.js:22) | Initiates drag interaction on a clock hand |
+| [`doDrag(e)`](js/interactions.js:31) | Handles ongoing drag movement to update clock hands |
+
+### admin.js
+| Function | Purpose |
+|----------|--------|
+| [`adminLogin()`](js/admin.js:18) | Admin login and data fetching |
+| [`filterAdminStats()`](js/admin.js:64) | Filters stats by class/mode |
+| [`calculateTotalScores()`](js/admin.js:82) | Calculates total scores per student |
+| [`renderAdminTable()`](js/admin.js:149) | Renders the admin stats table |
+| [`renderAdminSummary()`](js/admin.js:180) | Renders admin summary statistics |
 
 ---
 
@@ -164,7 +212,7 @@ The analog clock supports two input methods:
 2. **Drag and drop** — Both mouse and touch events are supported. Users can grab either the hour or minute hand and drag it around the clock face.
 
 ### Drag Implementation Details
-- The angle from the clock center to the cursor is calculated using [`getAngle()`](script.js:456) with `Math.atan2`.
+- The angle from the clock center to the cursor is calculated using [`getAngle()`](js/interactions.js:11) with `Math.atan2`.
 - **Minute hand:** Snaps to 5-minute intervals (`Math.round(a/30)*30/6`).
 - **Hour hand:** Snaps to whole hours (`Math.round(a/30) || 12`).
 - Touch events use `{passive: false}` to prevent page scrolling during drag.
@@ -217,7 +265,7 @@ stateDiagram-v2
 
 ## Swedish Time Expressions
 
-The [`timeToSwedishText()`](script.js:340) function converts times to idiomatic Swedish clock expressions:
+The [`timeToSwedishText()`](js/tasks.js:20) function converts times to idiomatic Swedish clock expressions:
 
 | Minutes | Swedish Expression | Example (3:XX) |
 |---------|-------------------|-----------------|
@@ -238,7 +286,7 @@ The [`timeToSwedishText()`](script.js:340) function converts times to idiomatic 
 
 ## Names and Activities (Problem Solving Mode)
 
-The problem-solving mode uses randomized names and activities defined in [`generateProblemTask()`](script.js:385):
+The problem-solving mode uses randomized names and activities defined in [`generateProblemTask()`](js/tasks.js:75):
 
 - **Names:** Elias, Ahmad, Rasmus, Hawbir, Kismah, Anki, Annika, Hanna G, Hanna B, Anna, Emin, Brittis, Evelina, Klas, Christian, Conny, Cecilia, Carro, Catalin, Mi, Aya, Barnabe
 - **Activities:** bada, cykla, läsa, titta på TV, träna, äta frukost, spela fotboll, ha rast, rita, spela roblox, rätta prov
@@ -253,7 +301,7 @@ See [`supabase/SETUP.md`](supabase/SETUP.md) for detailed setup instructions.
 ### Quick Setup:
 1. Create project at [supabase.com](https://supabase.com)
 2. Run [`supabase/schema.sql`](supabase/schema.sql) in SQL Editor
-3. Copy Project URL and anon key to [`script.js`](script.js:7-8)
+3. Copy Project URL and anon key to [`js/config.js`](js/config.js:7-8)
 
 ---
 

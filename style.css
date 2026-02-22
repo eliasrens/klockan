@@ -174,6 +174,21 @@ button { background-color: #00695C; color: white; border: none; padding: 15px 25
     border-bottom: none;
 }
 
+.stats-row.total-score {
+    background: linear-gradient(135deg, #00695C 0%, #004D40 100%);
+    color: white;
+    margin: -20px -20px 15px -20px;
+    padding: 20px 15px;
+    border-radius: 15px 15px 0 0;
+    font-weight: bold;
+    font-size: 1.1em;
+    border-bottom: none;
+}
+
+.stats-row.total-score .mode-label {
+    color: #FFB300;
+}
+
 .mode-label {
     font-weight: bold;
     color: #00695C;
