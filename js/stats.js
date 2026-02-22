@@ -65,7 +65,8 @@ async function saveGameResult(mode, finalScore, maxLvl, maxStrk) {
     }
     
     const stats = userStats[mode];
-    stats.score = Math.max(stats.score || 0, finalScore);
+    // Ackumulera poäng (lägg ihop all poäng)
+    stats.score = (stats.score || 0) + finalScore;
     stats.max_streak = Math.max(stats.max_streak || 0, maxStrk);
     stats.level = Math.max(stats.level || 1, maxLvl);
     stats.games_played = (stats.games_played || 0) + 1;
