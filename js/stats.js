@@ -51,7 +51,7 @@ function updateStatsSummary() {
     // Uppdatera totalpoäng
     const totalElement = document.getElementById('stats-total');
     if (totalElement) {
-        totalElement.textContent = `Poäng totalt: ${totalScore}`;
+        totalElement.textContent = `${totalScore}`;
     }
 }
 
