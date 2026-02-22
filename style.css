@@ -1,14 +1,27 @@
-body { background-color: #E0F2F1; font-family: 'Segoe UI', sans-serif; text-align: center; color: #37474F; margin: 0; padding: 20px; }
-.hidden { display: none !important; }
+body {
+    background-color: #E0F2F1;
+    font-family: 'Segoe UI', sans-serif;
+    text-align: center;
+    color: #37474F;
+    margin: 0;
+    padding: 20px;
+}
+
+.hidden {
+    display: none !important;
+}
 
 /* LOGIN SCREEN */
-#login-screen { max-width: 400px; margin: 0 auto; }
+#login-screen {
+    max-width: 400px;
+    margin: 0 auto;
+}
 
 #login-form {
     background-color: white;
     padding: 30px;
     border-radius: 20px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     margin-top: 20px;
 }
 
@@ -77,51 +90,175 @@ body { background-color: #E0F2F1; font-family: 'Segoe UI', sans-serif; text-alig
     margin-bottom: 25px;
     font-size: 18px;
     font-weight: bold;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* MENYN */
-.huvudrubrik { color: #00695C; font-size: 48px; margin-top: 50px; }
-.underrubrik { font-size: 24px; color: #546E7A; margin-bottom: 40px; }
-.menu-btn { display: block; width: 90%; max-width: 400px; margin: 15px auto; padding: 20px; font-size: 24px; background-color: #00695C; color: white; border: none; border-radius: 15px; cursor: pointer; transition: 0.2s; }
-.menu-btn:hover { background-color: #004D40; transform: scale(1.05); }
+.huvudrubrik {
+    color: #00695C;
+    font-size: 48px;
+    margin-top: 50px;
+}
+
+.underrubrik {
+    font-size: 24px;
+    color: #546E7A;
+    margin-bottom: 40px;
+}
+
+.menu-btn {
+    display: block;
+    width: 90%;
+    max-width: 400px;
+    margin: 15px auto;
+    padding: 20px;
+    font-size: 24px;
+    background-color: #00695C;
+    color: white;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.menu-btn:hover {
+    background-color: #004D40;
+    transform: scale(1.05);
+}
 
 /* SPELET */
-.back-btn { background-color: #546E7A; padding: 10px 20px; color: white; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 20px; }
-#timer-container { font-size: 28px; font-weight: bold; color: #C62828; background-color: #FFCDD2; padding: 10px 30px; border-radius: 15px; display: inline-block; margin-bottom: 20px; border: 3px solid #C62828; }
-#stats-board { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; }
-.stat-box { font-size: 20px; font-weight: bold; color: white; background-color: #FF8F00; padding: 10px 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-.target-time-badge { display: inline-block; background-color: #00695C; color: white; font-size: 32px; font-weight: bold; padding: 10px 30px; border-radius: 12px; margin-top: 10px; border: 3px solid #004D40; }
-#meddelande { font-size: 22px; font-weight: bold; height: 30px; margin: 20px 0; }
+.back-btn {
+    background-color: #546E7A;
+    padding: 10px 20px;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+#timer-container {
+    font-size: 28px;
+    font-weight: bold;
+    color: #C62828;
+    background-color: #FFCDD2;
+    padding: 10px 30px;
+    border-radius: 15px;
+    display: inline-block;
+    margin-bottom: 20px;
+    border: 3px solid #C62828;
+}
+
+#stats-board {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.stat-box {
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+    background-color: #FF8F00;
+    padding: 10px 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.target-time-badge {
+    display: inline-block;
+    background-color: #00695C;
+    color: white;
+    font-size: 32px;
+    font-weight: bold;
+    padding: 10px 30px;
+    border-radius: 12px;
+    margin-top: 10px;
+    border: 3px solid #004D40;
+}
+
+#meddelande {
+    font-size: 22px;
+    font-weight: bold;
+    height: 30px;
+    margin: 20px 0;
+}
 
 /* KLOCKAN */
-.clock { width: 300px; height: 300px; background-color: white; border: 10px solid #00695C; border-radius: 50%; margin: 0 auto 40px auto; position: relative; touch-action: none; }
-.center-dot { width: 16px; height: 16px; background-color: #37474F; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; }
-.hand { background-color: #37474F; position: absolute; bottom: 50%; left: 50%; transform-origin: bottom; border-radius: 5px; cursor: grab; z-index: 5; }
-.hour-hand { width: 10px; height: 80px; } 
-.minute-hand { width: 6px; height: 120px; z-index: 6; }
+.clock {
+    width: 300px;
+    height: 300px;
+    background-color: white;
+    border: 10px solid #00695C;
+    border-radius: 50%;
+    margin: 0 auto 40px auto;
+    position: relative;
+    touch-action: none;
+}
+
+.center-dot {
+    width: 16px;
+    height: 16px;
+    background-color: #37474F;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+
+.hand {
+    background-color: #37474F;
+    position: absolute;
+    bottom: 50%;
+    left: 50%;
+    transform-origin: bottom;
+    border-radius: 5px;
+    cursor: grab;
+    z-index: 5;
+}
+
+.hour-hand {
+    width: 10px;
+    height: 80px;
+}
+
+.minute-hand {
+    width: 6px;
+    height: 120px;
+    z-index: 6;
+}
 
 /* SIFFRORNA */
-.number { 
-    position: absolute; 
-    font-size: 24px; 
-    font-weight: bold; 
-    color: #37474F; 
-    top: 50%; left: 50%; 
-    width: 30px; height: 30px; 
-    margin-top: -15px; margin-left: -15px; 
-    text-align: center; 
-    line-height: 30px; 
+.number {
+    position: absolute;
+    font-size: 24px;
+    font-weight: bold;
+    color: #37474F;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    margin-top: -15px;
+    margin-left: -15px;
+    text-align: center;
+    line-height: 30px;
 
     /* Dessa rader gör siffrorna till "spöken" som musen inte kan röra */
     pointer-events: none !important;
-    
+
     /* Förhindrar all form av markering i alla tänkbara webbläsare */
-    -webkit-user-select: none !important; /* Safari */
-    -moz-user-select: none !important;    /* Firefox */
-    -ms-user-select: none !important;     /* Internet Explorer/Edge */
-    user-select: none !important;         /* Standard */
-    
+    -webkit-user-select: none !important;
+    /* Safari */
+    -moz-user-select: none !important;
+    /* Firefox */
+    -ms-user-select: none !important;
+    /* Internet Explorer/Edge */
+    user-select: none !important;
+    /* Standard */
+
     /* Förhindrar att webbläsaren tror att man vill "dra" texten som ett objekt */
     -webkit-user-drag: none !important;
 }
@@ -135,22 +272,79 @@ body { background-color: #E0F2F1; font-family: 'Segoe UI', sans-serif; text-alig
 }
 
 /* Positionering av siffror */
-.number-1 { transform: rotate(30deg) translateY(-120px) rotate(-30deg); }
-.number-2 { transform: rotate(60deg) translateY(-120px) rotate(-60deg); }
-.number-3 { transform: rotate(90deg) translateY(-120px) rotate(-90deg); }
-.number-4 { transform: rotate(120deg) translateY(-120px) rotate(-120deg); }
-.number-5 { transform: rotate(150deg) translateY(-120px) rotate(-150deg); }
-.number-6 { transform: rotate(180deg) translateY(-120px) rotate(-180deg); }
-.number-7 { transform: rotate(210deg) translateY(-120px) rotate(-210deg); }
-.number-8 { transform: rotate(240deg) translateY(-120px) rotate(-240deg); }
-.number-9 { transform: rotate(270deg) translateY(-120px) rotate(-270deg); }
-.number-10 { transform: rotate(300deg) translateY(-120px) rotate(-300deg); }
-.number-11 { transform: rotate(330deg) translateY(-120px) rotate(-330deg); }
-.number-12 { transform: rotate(360deg) translateY(-120px) rotate(-360deg); }
+.number-1 {
+    transform: rotate(30deg) translateY(-120px) rotate(-30deg);
+}
 
-.controls { margin-top: 10px; margin-bottom: 50px; }
-button { background-color: #00695C; color: white; border: none; padding: 15px 25px; font-size: 18px; border-radius: 8px; margin: 5px; cursor: pointer; }
-.check-btn { background-color: #FFB300 !important; color: #37474F !important; font-weight: bold; padding: 15px 40px !important; }
+.number-2 {
+    transform: rotate(60deg) translateY(-120px) rotate(-60deg);
+}
+
+.number-3 {
+    transform: rotate(90deg) translateY(-120px) rotate(-90deg);
+}
+
+.number-4 {
+    transform: rotate(120deg) translateY(-120px) rotate(-120deg);
+}
+
+.number-5 {
+    transform: rotate(150deg) translateY(-120px) rotate(-150deg);
+}
+
+.number-6 {
+    transform: rotate(180deg) translateY(-120px) rotate(-180deg);
+}
+
+.number-7 {
+    transform: rotate(210deg) translateY(-120px) rotate(-210deg);
+}
+
+.number-8 {
+    transform: rotate(240deg) translateY(-120px) rotate(-240deg);
+}
+
+.number-9 {
+    transform: rotate(270deg) translateY(-120px) rotate(-270deg);
+}
+
+.number-10 {
+    transform: rotate(300deg) translateY(-120px) rotate(-300deg);
+}
+
+.number-11 {
+    transform: rotate(330deg) translateY(-120px) rotate(-330deg);
+}
+
+.number-12 {
+    transform: rotate(360deg) translateY(-120px) rotate(-360deg);
+}
+
+.controls {
+    margin-top: 10px;
+    margin-bottom: 50px;
+}
+.controls button {
+  touch-action: manipulation;
+}
+
+button {
+    background-color: #00695C;
+    color: white;
+    border: none;
+    padding: 15px 25px;
+    font-size: 18px;
+    border-radius: 8px;
+    margin: 5px;
+    cursor: pointer;
+}
+
+.check-btn {
+    background-color: #FFB300 !important;
+    color: #37474F !important;
+    font-weight: bold;
+    padding: 15px 40px !important;
+}
 
 /* STATS SUMMARY */
 #stats-summary {
@@ -159,7 +353,7 @@ button { background-color: #00695C; color: white; border: none; padding: 15px 25
     padding: 20px;
     margin: 20px auto;
     max-width: 400px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .stats-row {
@@ -233,7 +427,7 @@ button { background-color: #00695C; color: white; border: none; padding: 15px 25
     padding: 20px;
     margin: 20px auto;
     max-width: 600px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     display: flex;
     gap: 15px;
     align-items: center;
@@ -274,7 +468,7 @@ button { background-color: #00695C; color: white; border: none; padding: 15px 25
     border-radius: 15px;
     padding: 15px 25px;
     min-width: 140px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -296,7 +490,7 @@ button { background-color: #00695C; color: white; border: none; padding: 15px 25
     border-radius: 15px;
     padding: 15px;
     margin: 20px auto;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     overflow-x: auto;
 }
 
@@ -346,6 +540,14 @@ button { background-color: #00695C; color: white; border: none; padding: 15px 25
     color: white;
 }
 
-.mode-badge.enkel { background-color: #43A047; }
-.mode-badge.tid { background-color: #E65100; }
-.mode-badge.problem { background-color: #6A1B9A; }
+.mode-badge.enkel {
+    background-color: #43A047;
+}
+
+.mode-badge.tid {
+    background-color: #E65100;
+}
+
+.mode-badge.problem {
+    background-color: #6A1B9A;
+}
