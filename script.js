@@ -86,18 +86,49 @@ async function login() {
                 supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             }
             
-            // Försök logga in med Supabase (anonym inloggning)
-            const { data, error } = await supabaseClient.auth.signInAnonymously({
-                data: { name: userName, class: userClass }
-            });
+            // Kolla om användaren redan finns i databasen
+            const { data: existingProfile, error: profileError } = await supabaseClient
+                .from('profiles')
+                .select('*')
+                .eq('name', userName)
+                .eq('class', userClass)
+                .maybeSingle();
             
-            if (error) throw error;
+            if (profileError) throw profileError;
             
-            currentUser = {
-                id: data.user.id,
-                name: userName,
-                class: userClass
-            };
+            if (existingProfile) {
+                // Användaren finns - logga in
+                currentUser = {
+                    id: existingProfile.id,
+                    name: userName,
+                    class: userClass
+                };
+            } else {
+                // Ny användare - skapa ny profil
+                const { data: newProfile, error: insertError } = await supabaseClient
+                    .from('profiles')
+                    .insert({
+                        name: userName,
+                        class: userClass
+                    })
+                    .select()
+                    .single();
+                
+                if (insertError) throw insertError;
+                
+                // Initiera statistik för nya användaren
+                await supabaseClient.from('player_stats').insert([
+                    { user_id: newProfile.id, mode: 'enkel', score: 0, level: 1, max_streak: 0, games_played: 0 },
+                    { user_id: newProfile.id, mode: 'tid', score: 0, level: 1, max_streak: 0, games_played: 0 },
+                    { user_id: newProfile.id, mode: 'problem', score: 0, level: 1, max_streak: 0, games_played: 0 }
+                ]);
+                
+                currentUser = {
+                    id: newProfile.id,
+                    name: userName,
+                    class: userClass
+                };
+            }
             
             // Spara till localStorage
             localStorage.setItem('klockspelet_user', JSON.stringify(currentUser));
