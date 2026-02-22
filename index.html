@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Klockspelet</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <div id="main-menu">
+        <h1 class="huvudrubrik">Klockspelet</h1>
+        <p class="underrubrik">Välj hur du vill spela!</p>
+        
+        <button class="menu-btn" onclick="startGame('enkel')">🧠 Enkel klockträning</button>
+        <button class="menu-btn" onclick="startGame('tid')">⏱️ Tidsutmaning</button>
+        <button class="menu-btn" onclick="startGame('problem')">🕵️ Problemlösning</button>
+    </div>
+
+    <div id="game-container" class="hidden">
+        
+        <button class="back-btn" onclick="showMenu()">🔙 Tillbaka till menyn</button>
+
+        <div id="timer-container" class="hidden">
+            ⏳ Tid kvar: <span id="time-left">30</span> s
+        </div>
+
+        <div id="stats-board">
+            <div class="stat-box">Nivå: <span id="level-display">1</span></div>
+            <div class="stat-box">Poäng: <span id="score-display">0</span></div>
+            <div class="stat-box">I rad: <span id="streak-display">0</span>/5</div>
+        </div>
+        
+        <div id="game-play-area">
+            <div id="uppdrag-container">
+                <span class="instruction-text" id="instruction-text">Ställ klockan på:</span><br>
+                <div id="uppdrag-tid" class="target-time-badge">Laddar...</div>
+            </div>
+            
+            <p id="meddelande"></p>
+
+            <div class="clock">
+                <div class="center-dot"></div>
+                <div class="number number-1">1</div><div class="number number-2">2</div>
+                <div class="number number-3">3</div><div class="number number-4">4</div>
+                <div class="number number-5">5</div><div class="number number-6">6</div>
+                <div class="number number-7">7</div><div class="number number-8">8</div>
+                <div class="number number-9">9</div><div class="number number-10">10</div>
+                <div class="number number-11">11</div><div class="number number-12">12</div>
+                
+                <div class="hand hour-hand" id="hourHand"></div>
+                <div class="hand minute-hand" id="minuteHand"></div>
+            </div>
+
+            <div class="controls">
+                <button onclick="addTime(1, 0)">+ 1 Timme</button>
+                <button onclick="addTime(0, 15)">+ 15 Minuter</button>
+                <button onclick="addTime(0, 5)">+ 5 Minuter</button>
+                <button onclick="checkAnswer()" class="check-btn">Rätta!</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
